@@ -1,0 +1,24 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data table</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/datatables.min.js"></script>
+</head>
+<body>
+
+    <table id="datatable" class="display" cellspacing="0" width="100%"><thead><tr><th>Name</th><th>Position</th><th>Office</th><th>Age</th><th>Start date</th><th>Salary</th></tr></thead><tbody></tbody></table>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#datatable').DataTable({
+            "columns": [{ "data": "Name" }, { "data": "Position" }, { "data": "Office" }, { "data": "Age" }, { "data": "StartDate" }, { "data": "Salary" }],
+            "processing": true,
+            "serverSide": true,
+            "ajax": "http://localhost:18367/Employee/getdata"
+        });
+    });
+</script>
+</body>
+</html>

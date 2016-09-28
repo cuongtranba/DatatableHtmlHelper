@@ -1,0 +1,32 @@
+﻿@using DatatableHtmlHelper.DataTableHelper
+@{
+    Layout = null;
+    var dataTableColumns = new List<DataTableColumn>()
+    {
+        new DataTableColumn("Office", 3),
+        new DataTableColumn("Name", 1),
+        new DataTableColumn("Position", 2),
+        new DataTableColumn("Start date", 5),
+        new DataTableColumn("Salary", 6),
+        new DataTableColumn("Age", 4)
+    };
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data table</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-2.2.3/dt-1.10.12/datatables.min.js"></script>
+</head>
+<body>
+
+    @Html.Datatable("datatable").AddColumns(dataTableColumns).AddHtmlAttributes(new { @class = "display", cellspacing = "0", width = "100%" }).AddDataTableOption(new
+{
+    processing = true,
+    serverSide = true,
+    ajax = Url.Action("GetData","Employee"),
+}).ToHtml()
+    @Html.TextBox("aaa","",new {})
+</body>
+</html>
