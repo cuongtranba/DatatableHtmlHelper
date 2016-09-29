@@ -99,7 +99,7 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
-    <Compile Include="DataTableHelper\ColumnOption.cs" />
+    <Compile Include="DataTableHelper\TypeHelper.cs" />
     <Compile Include="Models\Student.cs" />
     <Compile Include="DataTableHelper\Datatable.cs" />
     <Compile Include="DataTableHelper\DataTableColumn.cs" />

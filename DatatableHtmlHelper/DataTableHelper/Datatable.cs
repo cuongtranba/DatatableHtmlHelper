@@ -11,10 +11,11 @@ namespace DatatableHtmlHelper.DataTableHelper
 {
     public class Datatable
     {
-        private string tableHtml = "<table {id} {htmlattributes}><thead><tr>{columnheader}</tr></thead><tbody></tbody></table>";
+        private string tableHtml = "<table {id} {htmlattributes}><thead></thead><tbody></tbody></table>";
 
         private string tableScript = "<script type=\"text/javascript\">$(document).ready(function(){$(\'#{id}\').DataTable({{dataoption}{columnSetting}});});</script>";
-
+        StringBuilder tableOptionBuilder = new StringBuilder();
+        Stack<string> stackAttribute = new Stack<string>();
 
         public Datatable(string id)
         {
@@ -25,14 +26,10 @@ namespace DatatableHtmlHelper.DataTableHelper
 
         public Datatable AddColumns(List<DataTableColumn> dataTableColumns)
         {
-            var headerBuilder = new StringBuilder();
             dataTableColumns = dataTableColumns.OrderBy(c => c.Order).ToList();
-            foreach (var dataTableColumn in dataTableColumns)
-            {
-                headerBuilder.Append($"<th>{dataTableColumn.ColumnLabel}</th>");
-            }
-            FillValueForColumnSetting(dataTableColumns);
-            return FillValueDataTable("{columnheader}", headerBuilder.ToString());
+            var columnSettingObject = new { columns = dataTableColumns };
+            var columnSettingString = JsonConvert.SerializeObject(columnSettingObject, Formatting.Indented, new JsonSerializerSettings() { ContractResolver = new CamelCasePropertyNamesContractResolver() }).TrimStart('{').TrimEnd('}');
+            return FillValueDataTableScript("{columnSetting}", columnSettingString);
         }
 
         public Datatable AddHtmlAttributes(object htmlAttributes)
@@ -54,7 +51,6 @@ namespace DatatableHtmlHelper.DataTableHelper
                 return FillValueDataTableScript("{dataoption}", string.Empty);
             }
             var properties = options.GetType().GetProperties();
-            var tableOptionBuilder = new StringBuilder();
             foreach (var propertyInfo in properties)
             {
                 var propertyName = propertyInfo.Name;
@@ -63,9 +59,9 @@ namespace DatatableHtmlHelper.DataTableHelper
                 {
                     propertyValue = propertyValue.ToString().ToLower();
                 }
-                if (propertyValue is string)
+                else if (propertyValue is string)
                 {
-                    propertyValue = $"\"{propertyValue}\"";
+                    propertyValue = propertyValue.ToString().Contains("function") ? $"{propertyValue}" : $"\"{propertyValue}\"";
                 }
                 tableOptionBuilder.Append($"\"{propertyName}\":{propertyValue},");
             }
@@ -89,14 +85,6 @@ namespace DatatableHtmlHelper.DataTableHelper
             tableScript = tableScript.Replace(attribute, value);
             return this;
         }
-
-        private void FillValueForColumnSetting(List<DataTableColumn> dataTableColumns)
-        {
-            var columnSettingObject = new {columns = dataTableColumns};
-            var columnSettingString = JsonConvert.SerializeObject(columnSettingObject, Formatting.Indented,new JsonSerializerSettings() {ContractResolver = new CamelCasePropertyNamesContractResolver()}).TrimStart('{').TrimEnd('}');
-            tableScript=tableScript.Replace("{columnSetting}", columnSettingString);
-        }
         #endregion
-
     }
 }

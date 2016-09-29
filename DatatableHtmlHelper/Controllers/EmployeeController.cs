@@ -14,14 +14,15 @@ namespace DatatableHtmlHelper.Controllers
         {
             return View();
         }
-
-        public ActionResult GetData(DTParameters param)
+        [HttpPost]
+        public JsonResult GetData(DTParameters param)
         {
             var employees=new List<Employee>();
             for (int i = 0; i < 1; i++)
             {
                 var employee=new Employee()
                 {
+                    Id = i,
                     Age = i,
                     Name = "name"+i,
                     Office = "office"+i,

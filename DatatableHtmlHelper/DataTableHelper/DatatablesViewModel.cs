@@ -1,6 +1,7 @@
 ﻿///
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DatatableHtmlHelper.DataTableHelper
 {
@@ -116,7 +117,20 @@ namespace DatatableHtmlHelper.DataTableHelper
                     : null;
             }
         }
-
+        /// <summary>
+        /// Get Columns Searchable
+        /// </summary>
+        public List<string> SearchableColumnNames
+        {
+            get
+            {
+                if (!this.Columns.Any())
+                {
+                    return new List<string>();
+                }
+                return Columns.Where(c => c.Searchable).Select(c => c.Data).ToList();
+            }
+        }
     }
 
     /// <summary>

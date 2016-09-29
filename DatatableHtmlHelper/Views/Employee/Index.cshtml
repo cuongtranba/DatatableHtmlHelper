@@ -3,12 +3,13 @@
     Layout = null;
     var dataTableColumns = new List<DataTableColumn>()
     {
-        new DataTableColumn("Office","Office", 3,false),
-        new DataTableColumn("Name","Name", 1,false),
-        new DataTableColumn("Position","Position", 2,false),
-        new DataTableColumn("Start Date","StartDate", 5,false),
-        new DataTableColumn("Salary","Salary", 6,false),
-        new DataTableColumn("Salary","Age", 4,false)
+        new DataTableColumn("Office","Office", 3,false,false),
+        new DataTableColumn("Name","Name", 1,true,false),
+        new DataTableColumn("Position","Position", 2,true,true),
+        new DataTableColumn("Start Date","StartDate", 5,true,false),
+        new DataTableColumn("Salary","Salary", 6,false,false),
+        new DataTableColumn("Salary","Age", 4,false,false),
+        new DataTableColumn("Id","Id", 7,false,false)
     };
 }
 <!DOCTYPE html>
@@ -25,8 +26,19 @@
 {
     processing = true,
     serverSide = true,
-    ajax = Url.Action("GetData","Employee"),
-    paging=true
+    paging = true,
+    rowId = "Id",
+    ajax = $"{{\"url\" : \"{Url.Action("GetData", "Employee")}\",\"type\": \"POST\",\"contentType\": \'application/json; charset=utf-8\', \"data\" : function(data){{return data = JSON.stringify(data);}}}}",
 }).ToHtml()
+    
+    
+    @*@Html.Datatable("datatable").AddColumns(dataTableColumns).AddHtmlAttributes(new { @class = "display", cellspacing = "0", width = "100%" }).AddDataTableOption(new
+{
+    processing = true,
+    serverSide = true,
+    paging = true,
+    rowId = "Id",
+    ajax = Url.Action("GetData", "Employee"),
+}).ToHtml()*@
 </body>
 </html>
