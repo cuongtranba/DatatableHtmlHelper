@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DatatableHtmlHelper.DataTableHelper
 {
@@ -11,9 +13,8 @@ namespace DatatableHtmlHelper.DataTableHelper
     {
         private string tableHtml = "<table {id} {htmlattributes}><thead><tr>{columnheader}</tr></thead><tbody></tbody></table>";
 
-        private string tableScript = "<script type=\"text/javascript\">$(document).ready(function(){$(\'#{id}\').DataTable({dataoption});});</script>";
+        private string tableScript = "<script type=\"text/javascript\">$(document).ready(function(){$(\'#{id}\').DataTable({{dataoption}{columnSetting}});});</script>";
 
-        private StringBuilder tableOptionBuilder=new StringBuilder();
 
         public Datatable(string id)
         {
@@ -21,31 +22,19 @@ namespace DatatableHtmlHelper.DataTableHelper
             FillValueDataTableScript("{id}", id);
         }
 
-        private Datatable FillValueDataTableScript(string attribute, string value)
-        {
-            tableScript = tableScript.Replace(attribute, value);
-            return this;
-        }
 
         public Datatable AddColumns(List<DataTableColumn> dataTableColumns)
         {
             var headerBuilder = new StringBuilder();
-            var columnOption =new ColumnOption();
-
             dataTableColumns = dataTableColumns.OrderBy(c => c.Order).ToList();
             foreach (var dataTableColumn in dataTableColumns)
             {
-                headerBuilder.Append($"<th>{dataTableColumn.ColumnName}</th>");
-                var column=new columns()
-                {
-                    data = dataTableColumn.ColumnName.Replace(" ",String.Empty)
-                };
-                columnOption.columns.Add(column);
+                headerBuilder.Append($"<th>{dataTableColumn.ColumnLabel}</th>");
             }
-            var columnAttributeString = JsonConvert.SerializeObject(columnOption).TrimStart('{').TrimEnd('}')+",";
-            tableOptionBuilder.Append(columnAttributeString);
+            FillValueForColumnSetting(dataTableColumns);
             return FillValueDataTable("{columnheader}", headerBuilder.ToString());
         }
+
         public Datatable AddHtmlAttributes(object htmlAttributes)
         {
             var properties = htmlAttributes.GetType().GetProperties();
@@ -54,7 +43,7 @@ namespace DatatableHtmlHelper.DataTableHelper
             {
                 attributeBuilder.Append($" {propertyInfo.Name.ToLower()}=\"{propertyInfo.GetValue(htmlAttributes, null)}\"");
             }
-            
+
             return FillValueDataTable("{htmlattributes}", attributeBuilder.ToString());
         }
 
@@ -62,9 +51,10 @@ namespace DatatableHtmlHelper.DataTableHelper
         {
             if (options == null)
             {
-                return FillValueDataTableScript("dataoption", string.Empty);
+                return FillValueDataTableScript("{dataoption}", string.Empty);
             }
             var properties = options.GetType().GetProperties();
+            var tableOptionBuilder = new StringBuilder();
             foreach (var propertyInfo in properties)
             {
                 var propertyName = propertyInfo.Name;
@@ -79,17 +69,34 @@ namespace DatatableHtmlHelper.DataTableHelper
                 }
                 tableOptionBuilder.Append($"\"{propertyName}\":{propertyValue},");
             }
-            return FillValueDataTableScript("dataoption", tableOptionBuilder.ToString().TrimEnd(','));
-        }
-        private Datatable FillValueDataTable(string attribute, string value)
-        {
-            tableHtml = tableHtml.Replace(attribute, value);
-            return this;
+            return FillValueDataTableScript("{dataoption}", tableOptionBuilder.ToString());
         }
 
         public HtmlString ToHtml()
         {
             return new HtmlString(tableHtml + tableScript);
         }
+
+        #region private method
+        private Datatable FillValueDataTable(string attribute, string value)
+        {
+            tableHtml = tableHtml.Replace(attribute, value);
+            return this;
+        }
+
+        private Datatable FillValueDataTableScript(string attribute, string value)
+        {
+            tableScript = tableScript.Replace(attribute, value);
+            return this;
+        }
+
+        private void FillValueForColumnSetting(List<DataTableColumn> dataTableColumns)
+        {
+            var columnSettingObject = new {columns = dataTableColumns};
+            var columnSettingString = JsonConvert.SerializeObject(columnSettingObject, Formatting.Indented,new JsonSerializerSettings() {ContractResolver = new CamelCasePropertyNamesContractResolver()}).TrimStart('{').TrimEnd('}');
+            tableScript=tableScript.Replace("{columnSetting}", columnSettingString);
+        }
+        #endregion
+
     }
 }

@@ -3,12 +3,12 @@
     Layout = null;
     var dataTableColumns = new List<DataTableColumn>()
     {
-        new DataTableColumn("Office", 3),
-        new DataTableColumn("Name", 1),
-        new DataTableColumn("Position", 2),
-        new DataTableColumn("Start date", 5),
-        new DataTableColumn("Salary", 6),
-        new DataTableColumn("Age", 4)
+        new DataTableColumn("Office","Office", 3,false),
+        new DataTableColumn("Name","Name", 1,false),
+        new DataTableColumn("Position","Position", 2,false),
+        new DataTableColumn("Start Date","StartDate", 5,false),
+        new DataTableColumn("Salary","Salary", 6,false),
+        new DataTableColumn("Salary","Age", 4,false)
     };
 }
 <!DOCTYPE html>
@@ -26,7 +26,7 @@
     processing = true,
     serverSide = true,
     ajax = Url.Action("GetData","Employee"),
+    paging=true
 }).ToHtml()
-    @Html.TextBox("aaa","",new {})
 </body>
 </html>

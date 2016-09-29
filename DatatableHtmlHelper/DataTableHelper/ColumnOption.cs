@@ -10,5 +10,6 @@ namespace DatatableHtmlHelper.DataTableHelper
     public class columns
     {
         public string data { get; set; }
+        public string orderable { get; set; }
     }
 }
